@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Truco</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #343a40;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            width: 100px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .result.correct {
+            color: #007bff;
+        }
+        .result.incorrect {
+            color: #ff9800;
+        }
+        .scoreboard {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Juego de Truco</h1>
+    <p>Selecciona cuál carta crees que gana.</p>
+
+    <div class="card-container">
+        <div class="card" id="card1" onclick="selectCard(1)"><img src="" alt="Carta 1"></div>
+        <div class="card" id="card2" onclick="selectCard(2)"><img src="" alt="Carta 2"></div>
+    </div>
+
+    <p class="result" id="result"></p>
+
+    <div class="scoreboard">
+        <p>Correctos: <span id="correctCount">0</span></p>
+        <p>Incorrectos: <span id="incorrectCount">0</span></p>
+    </div>
+
+    <script>
+        var cardOrder = {
+            "1 de espadas": 1, "1 de bastos": 2, "7 de espadas": 3, "7 de oros": 4, 
+            "3 de espadas": 5, "3 de bastos": 5, "3 de oros": 5, "3 de copas": 5,
+            "2 de espadas": 6, "2 de bastos": 6, "2 de oros": 6, "2 de copas": 6,
+            "1 de copas": 7, "1 de oros": 8, 
+            "12 de espadas": 9, "12 de bastos": 9, "12 de oros": 9, "12 de copas": 9,
+            "11 de espadas": 10, "11 de bastos": 10, "11 de oros": 10, "11 de copas": 10,
+            "10 de espadas": 11, "10 de bastos": 11, "10 de oros": 11, "10 de copas": 11,
+            "7 de copas": 12, "7 de bastos": 12,
+            "6 de espadas": 13, "6 de bastos": 13, "6 de oros": 13, "6 de copas": 13,
+            "5 de espadas": 14, "5 de bastos": 14, "5 de oros": 14, "5 de copas": 14,
+            "4 de espadas": 15, "4 de bastos": 15, "4 de oros": 15, "4 de copas": 15
+        };
+
+        let currentCards = [];
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        function getRandomCard() {
+            var suits = ["espadas", "bastos", "oros", "copas"];
+            let rank;
+            let card;
+            do {
+                rank = Math.ceil(Math.random() * 12);
+                if (rank === 8 || rank === 9) continue; // Excluir 8 y 9
+                var chosenSuit = suits[Math.floor(Math.random() * suits.length)];
+                card = `${rank} de ${chosenSuit}`;
+            } while (!cardOrder[card]);
+            return card;
+        }
+
+        function getCardImage(card) {
+            var [rank, suit] = card.split(" de ");
+            return `Cartas/${rank}_${suit}.jpg`; // Ruta de las imágenes, ajusta según sea necesario.
+        }
+
+        function generateCards() {
+            let card1, card2;
+            do {
+                card1 = getRandomCard();
+                card2 = getRandomCard();
+            } while (card1 === card2);
+
+            currentCards = [card1, card2];
+
+            document.getElementById('card1').querySelector('img').src = getCardImage(card1);
+            document.getElementById('card2').querySelector('img').src = getCardImage(card2);
+
+            document.getElementById('result').textContent = '';
+        }
+
+        function selectCard(cardIndex) {
+            var [card1, card2] = currentCards;
+            var card1Value = cardOrder[card1];
+            var card2Value = cardOrder[card2];
+
+            var resultElement = document.getElementById('result');
+
+            if (card1Value === card2Value) {
+                resultElement.textContent = `Empate: ${card1} y ${card2} tienen el mismo valor.`;
+                resultElement.className = 'result';
+            } else {
+                var selectedCard = cardIndex === 1 ? card1 : card2;
+                var otherCard = cardIndex === 1 ? card2 : card1;
+                var isCorrect = (card1Value < card2Value && cardIndex === 1) ||
+                                  (card2Value < card1Value && cardIndex === 2);
+
+                if (isCorrect) {
+                    resultElement.textContent = `¡Correcto! ${selectedCard} gana a ${otherCard}.`;
+                    resultElement.className = 'result correct';
+                    correctCount++;
+                } else {
+                    resultElement.textContent = `Incorrecto. ${otherCard} gana a ${selectedCard}.`;
+                    resultElement.className = 'result incorrect';
+                    incorrectCount++;
+                }
+            }
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+
+            setTimeout(nextRound, 1000); // Espera 1 segundo antes de la nueva ronda.
+        }
+
+        function nextRound() {
+            generateCards();
+        }
+
+        // Inicializar el juego
+        generateCards();
+    </script>
+</body>
+</html>
