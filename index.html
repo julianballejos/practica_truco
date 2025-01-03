@@ -46,7 +46,7 @@
         }
         .scoreboard {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 12px;
         }
         button {
             padding: 10px 20px;
@@ -71,12 +71,12 @@
         <div class="card" id="card2" onclick="selectCard(2)"><img src="" alt="Carta 2"></div>
     </div>
 
-    <p class="result" id="result"></p>
-
     <div class="scoreboard">
         <p>Correctos: <span id="correctCount">0</span></p>
         <p>Incorrectos: <span id="incorrectCount">0</span></p>
     </div>
+    
+    <p class="result" id="result"></p>
 
     <script>
         var cardOrder = {
@@ -160,7 +160,7 @@
             document.getElementById('correctCount').textContent = correctCount;
             document.getElementById('incorrectCount').textContent = incorrectCount;
 
-            setTimeout(nextRound, 1000); // Espera 1 segundo antes de la nueva ronda.
+            setTimeout(nextRound, 500); // Espera 0.5 segundo antes de la nueva ronda.
         }
 
         function nextRound() {
